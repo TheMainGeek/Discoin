@@ -27,7 +27,36 @@ app.use("/", router);
 
 router.get("/newacc", (req, res) => {
 	var public = generateString(32);
-	res.send(empty.concat('{"address": "', public, '"}'));
+	walletdb.set(public, 0)
+	res.send(empty.concat('Your new wallet address is', public, '!'));
 });
-
+router.post("/mine", (req, res) => {
+	if (!walletdb.has(req.body.wallet)) {return res.send("Specified wallet was not found! Go to /newacc to make a new wallet!")}
+	Discoin.newBlock(new Block(
+		Discoin.blockchainLength,
+		Date.now(),
+		{
+			"miner": req.body.wallet
+		},
+		Math.floor(Math.random() * (999999 - 999) + 999)
+	));
+	var newBal = walletdb.get(req.body.wallet) + Discoin.latestBlock().calculatePayout();
+	walletdb.set(req.body.wallet, newBal);
+	Discoin.saveBlockchainToDisk()
+	res.send(`You mined a block! ${Discoin.latestBlock().calculatePayout()} DSC has been deposited into your wallet.`);
+});
+router.get("/mine", (req, res) => {
+	Discoin.newBlock(new Block(
+		Discoin.blockchainLength,
+		Date.now(),
+		{
+			"miner": "Zlqzuk$!0q#4yvQfHx#xZItoMW@zXTWo"
+		},
+		Math.floor(Math.random() * (999999 - 999) + 999)
+	));
+	var newBal = walletdb.get("Zlqzuk$!0q#4yvQfHx#xZItoMW@zXTWo") + Discoin.latestBlock().calculatePayout();
+	walletdb.set("Zlqzuk$!0q#4yvQfHx#xZItoMW@zXTWo", newBal);
+	Discoin.saveBlockchainToDisk()
+	res.send(`You mined a block! Since you visited this page using GET and not POST, ${Discoin.latestBlock().calculatePayout()} DSC has been deposited into the creators' wallet.`);
+});
 app.listen(8080);
