@@ -33,7 +33,7 @@ router.get("/newacc", (req, res) => {
 router.post("/mine", (req, res) => {
 	if (!walletdb.has(req.body.wallet)) {return res.send("Specified wallet was not found! Go to /newacc to make a new wallet!")}
 	Discoin.newBlock(new Block(
-		Discoin.blockchainLength,
+		Discoin.blockchainLength() + 1,
 		Date.now(),
 		{
 			"miner": req.body.wallet
@@ -43,11 +43,11 @@ router.post("/mine", (req, res) => {
 	var newBal = walletdb.get(req.body.wallet) + Discoin.latestBlock().calculatePayout();
 	walletdb.set(req.body.wallet, newBal);
 	Discoin.saveBlockchainToDisk()
-	res.send(`You mined a block! ${Discoin.latestBlock().calculatePayout()} DSC has been deposited into your wallet.`);
+	res.send(`You mined a block! ${Discoin.latestBlock().calculatePayout()} DSC has been deposited into your wallet.\n`);
 });
 router.get("/mine", (req, res) => {
 	Discoin.newBlock(new Block(
-		Discoin.blockchainLength,
+		Discoin.blockchainLength() + 1,
 		Date.now(),
 		{
 			"miner": "Zlqzuk$!0q#4yvQfHx#xZItoMW@zXTWo"
@@ -57,6 +57,17 @@ router.get("/mine", (req, res) => {
 	var newBal = walletdb.get("Zlqzuk$!0q#4yvQfHx#xZItoMW@zXTWo") + Discoin.latestBlock().calculatePayout();
 	walletdb.set("Zlqzuk$!0q#4yvQfHx#xZItoMW@zXTWo", newBal);
 	Discoin.saveBlockchainToDisk()
-	res.send(`You mined a block! Since you visited this page using GET and not POST, ${Discoin.latestBlock().calculatePayout()} DSC has been deposited into the creators' wallet.`);
+	res.send(`You mined a block! Since you visited this page using GET and not POST, ${Discoin.latestBlock().calculatePayout()} DSC has been deposited into the creators' wallet.\n`);
+});
+router.get("/bal", (req, res) => {
+	var bal = walletdb.get("Zlqzuk$!0q#4yvQfHx#xZItoMW@zXTWo");
+	Discoin.saveBlockchainToDisk()
+	res.send(`The balance of the creators' wallet is ${bal}\n`);
+});
+router.post("/bal", (req, res) => {
+	if (!walletdb.has(req.body.wallet)) {return res.send("Specified wallet was not found! Go to /newacc to make a new wallet!")}
+	var bal = walletdb.get(req.body.wallet);
+	Discoin.saveBlockchainToDisk()
+	res.send(`The balance of your wallet is ${bal}\n`);
 });
 app.listen(8080);
