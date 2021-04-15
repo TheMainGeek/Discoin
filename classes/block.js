@@ -18,7 +18,7 @@ module.exports = {
 			return hash;
 		}
 		calculatePayout() {
-			var num = (0.051 * this.difficulty) / 69.420;
+			var num = (this.difficulty / 69.420) / 45.341;
 			return Math.ceil(num * 100) / 1000;
 		}
 	}

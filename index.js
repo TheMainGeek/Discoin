@@ -3,6 +3,7 @@ const { Block } = require('./classes/block.js');
 const JSONdb = require('simple-json-db');
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 
 function generateString(length) {
   var result = [];
@@ -69,5 +70,8 @@ router.post("/bal", (req, res) => {
 	var bal = walletdb.get(req.body.wallet);
 	Discoin.saveBlockchainToDisk()
 	res.send(`The balance of your wallet is ${bal}\n`);
+});
+router.get("/", (req, res) => {
+	res.send(fs.readFileSync("./data/blockchain.json"));
 });
 app.listen(8080);
