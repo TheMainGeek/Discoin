@@ -75,3 +75,4 @@ router.get("/", (req, res) => {
 	res.send(fs.readFileSync("./data/blockchain.json"));
 });
 app.listen(8080);
+Discoin.loadBlockchainFromDisk();

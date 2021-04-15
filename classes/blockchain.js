@@ -23,5 +23,8 @@ module.exports = {
 		saveBlockchainToDisk() {
 			fs.writeFileSync(this.blockchainFile, JSON.stringify(this.blockchain))
 		}
+		loadBlockchainFromDisk() {
+			this.blockchain = JSON.parse(fs.readFileSync(this.blockchainFile).toString());
+		}
 	}
 }
